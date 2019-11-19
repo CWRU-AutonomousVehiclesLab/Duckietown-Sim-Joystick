@@ -21,3 +21,5 @@ In addition, you will need to instsall Ubuntu Xbox joystick drivers:
     $ sudo apt-get install xboxdrv
     $ sudo rmmod xpad
     $ sudo xboxdrv
+
+## Folder file sctructure
