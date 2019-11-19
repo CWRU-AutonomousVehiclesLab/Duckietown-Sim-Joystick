@@ -43,5 +43,5 @@ class Reader:
         self._log_file.close()
 
 
-reader = Reader('raw_log_temp.log')
+reader = Reader('raw_log.log')
 reader.read()

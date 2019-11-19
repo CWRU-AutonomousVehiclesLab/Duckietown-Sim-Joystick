@@ -11,7 +11,6 @@ import json
 import sys
 import cv2
 import time
-
 import gym
 import numpy as np
 import pyglet
@@ -48,7 +47,7 @@ args = parser.parse_args()
 
 
 def sleep_after_reset(seconds):
-    for remaining in range(0, 0, -1):
+    for remaining in range(seconds, 0, -1):
         sys.stdout.write("\r")
         sys.stdout.write("{:2d} seconds remaining.".format(remaining))
         sys.stdout.flush()
@@ -61,7 +60,7 @@ def sleep_after_reset(seconds):
 if args.env_name is None:
     env = DuckietownEnv(
         map_name=args.map_name,
-        max_steps=100,
+        max_steps=1500,
 
         draw_curve=args.draw_curve,
         draw_bbox=args.draw_bbox,
@@ -121,7 +120,7 @@ def playback():
         print('Size of rawlog: ',len(rawlog.recording))
     #! Done
     cv2.destroyAllWindows()
-    return qa
+    return
 
 
 @env.unwrapped.window.event
