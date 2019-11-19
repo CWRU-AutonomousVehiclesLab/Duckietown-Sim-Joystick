@@ -22,8 +22,8 @@ class Reader:
                     action = step[1]
                     x = -action[0]
                     z = -action[1]
-                    canvas = step[0]
-
+                    
+                    canvas = cv2.resize(step[0], (640,480))
                     #! Speed bar indicator
                     cv2.rectangle(canvas, (20, 240), (50, int(240+220*x)),
                                   (76, 84, 255), cv2.FILLED)

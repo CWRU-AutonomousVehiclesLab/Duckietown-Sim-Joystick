@@ -36,7 +36,7 @@ logger.setLevel(logging.WARNING)
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-name', default=None)
 parser.add_argument('--map-name', default='zigzag_dists')
-parser.add_argument('--draw-curve', default=True, action='store_true',
+parser.add_argument('--draw-curve', default=False, action='store_true',
                     help='draw the lane following curve')
 parser.add_argument('--draw-bbox', default=False, action='store_true',
                     help='draw collision detection bounding boxes')
@@ -52,7 +52,7 @@ def sleep_after_reset(seconds):
         sys.stdout.write("{:2d} seconds remaining.".format(remaining))
         sys.stdout.flush()
         time.sleep(1)
-    sys.stdout.write("\rComplete!            \n")
+    sys.stdout.write("\rGO!            \n")
     return
 
 
