@@ -1,6 +1,6 @@
-# CWRU Duckietown Driver
+# CWRU Duckietown Driving School
 
-This "package" is developed by [Frank](Chude.Qian@case.edu) to better obtain human drivable logs for the duckietown system. 
+This driving school system is developed by [Frank](Chude.Qian@case.edu) to better obtain human drivable logs for the duckietown system. 
 
 The system utilizes an Xbox 360 joystick to drive around. Left up and down controls the speed and right stick left and right controls the velocity. Right trigger enables the ["DRS" mode](https://en.wikipedia.org/wiki/Drag_reduction_system) allows vehicle to drive full speed forward. (Note there are no angular acceleration). 
 
