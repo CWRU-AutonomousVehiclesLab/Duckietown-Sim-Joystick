@@ -11,11 +11,11 @@ class Logger:
         self._log_file = open(log_file, 'wb')
         # we log the data in a multithreaded fashion
         self._multithreaded_recording = ThreadPoolExecutor(4)
-        self._recording = []
+        self.recording = []
 
     def log(self, observation, action, reward, done, info):
         x, y, z = self.env.cur_pos
-        self._recording.append({
+        self.recording.append({
             'step': [
                 observation,
                 action,
