@@ -1,4 +1,6 @@
 import numpy as np
+
+
 class SteeringToWheelVelWrapper:
     """ Converts policy that was trained with [velocity|heading] actions to
     [wheelvel_left|wheelvel_right] to comply with AIDO evaluation format
@@ -43,7 +45,10 @@ class SteeringToWheelVelWrapper:
         u_r = omega_r * k_r_inv
         u_l = omega_l * k_l_inv
 
-        vels = np.array([u_l, u_r])
+        # limiting output to limit, which is 1.0 for the duckiebot
+        u_r_limited = max(min(u_r, self.limit), -self.limit)
+        u_l_limited = max(min(u_l, self.limit), -self.limit)
 
+        vels = np.array([u_l_limited, u_r_limited])
         return vels
-convertion_wrapper = SteeringToWheelVelWrapper()
+

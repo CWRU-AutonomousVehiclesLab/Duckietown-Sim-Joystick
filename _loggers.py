@@ -38,6 +38,7 @@ class Logger:
         pickle.dump(self.recording, self._log_file)
         self._log_file.flush()
         del self.recording[:]
+        self.recording.clear()
 
     def close(self):
         self._multithreaded_recording.shutdown()

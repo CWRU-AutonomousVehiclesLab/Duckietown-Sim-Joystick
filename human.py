@@ -212,18 +212,20 @@ def update(dt):
 
     #! Nominal Joystick Interpretation
     x = round(joystick.y, 2)  # To ensure maximum trun/velocity ratio
-    z = round(joystick.rx, 2)*2
+    z = round(joystick.rx, 2) * 2
 
     #! Joystick deadband
-    if (abs(round(joystick.rx, 2)) < 0.1):
+    if (abs(round(joystick.rx, 2)) < 0.05):
         z = 0.0
 
-    if (abs(round(joystick.y, 2)) < 0.1):
+    if (abs(round(joystick.y, 2)) < 0.05):
         x = 0.0
 
     #! DRS enable for straight line
     if joystick.buttons[5]:
-        x = -2
+        x = -1.0
+        z = 0.0
+        
 
     action = np.array([-x, -z])
     pwm_left,pwm_right=pwm_converter.convert(-x,-z)
