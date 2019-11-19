@@ -64,7 +64,7 @@ def sleep_after_reset(seconds):
 if args.env_name is None:
     env = DuckietownEnv(
         map_name=args.map_name,
-        max_steps=1500,
+        max_steps=1000,
 
         draw_curve=args.draw_curve,
         draw_bbox=args.draw_bbox,
