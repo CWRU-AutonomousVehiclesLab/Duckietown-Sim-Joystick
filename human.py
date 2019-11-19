@@ -100,9 +100,9 @@ def playback():
         pwm_left,pwm_right=pwm_converter.convert(x,z)
         print('Linear: ',x,' Angular: ',z,'Left PWM: ',round(pwm_left,3),' Right PWM: ',round(pwm_right,3))
         #! Speed bar indicator
-        cv2.rectangle(canvas, (20, 240), (50, int(240+220*x)),
+        cv2.rectangle(canvas, (20, 240), (50, int(240-220*x)),
                       (76, 84, 255), cv2.FILLED)
-        cv2.rectangle(canvas, (320, 430), (int(320+150*z), 460),
+        cv2.rectangle(canvas, (320, 430), (int(320-150*z), 460),
                       (76, 84, 255), cv2.FILLED)
 
         cv2.imshow('Playback', canvas)
@@ -212,7 +212,7 @@ def update(dt):
 
     #! Nominal Joystick Interpretation
     x = round(joystick.y, 2)  # To ensure maximum trun/velocity ratio
-    z = round(joystick.rx, 2)*2.2
+    z = round(joystick.rx, 2)*2
 
     #! Joystick deadband
     if (abs(round(joystick.rx, 2)) < 0.1):
