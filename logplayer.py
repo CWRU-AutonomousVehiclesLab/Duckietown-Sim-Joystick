@@ -2,8 +2,10 @@ import os
 import pickle
 import numpy as np
 import cv2
+
+
 class Reader:
-    
+
     def __init__(self, log_file):
         self._log_file = open(log_file, 'rb')
 
@@ -17,30 +19,29 @@ class Reader:
                 log = pickle.load(self._log_file)
                 for entry in log:
                     step = entry['step']
-                    observations.append(step[0])
-                    actions.append(step[1])
-            
-                    #! Playback
-                    val =np.array_str(step[1])
-                
-                    observation = cv2.resize(step[0], (80, 60))
-                    # NOTICE: OpenCV changes the order of the channels !!!
-                    observation = cv2.cvtColor(observation, cv2.COLOR_BGR2RGB)
+                    action = step[1]
+                    x = -action[0]
+                    z = -action[1]
+                    canvas = step[0]
 
-                    cv2.imshow(val,observation)
+                    #! Speed bar indicator
+                    cv2.rectangle(canvas, (20, 240), (50, int(240+220*x)),
+                                  (76, 84, 255), cv2.FILLED)
+                    cv2.rectangle(canvas, (320, 430), (int(320+300*z), 460),
+                                  (76, 84, 255), cv2.FILLED)
 
-                    cv2.waitKey(10)
-
+                    cv2.imshow('Playback', canvas)
+                    cv2.waitKey(100)
+                # TODO: Add selection
             except EOFError:
-            
+
                 end = True
 
-        
-        
         return observations, actions
 
     def close(self):
         self._log_file.close()
 
-reader = Reader('training_data.log')
+
+reader = Reader('raw_log_temp.log')
 reader.read()

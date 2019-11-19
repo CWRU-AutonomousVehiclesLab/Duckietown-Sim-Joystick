@@ -48,7 +48,7 @@ args = parser.parse_args()
 
 
 def sleep_after_reset(seconds):
-    for remaining in range(seconds, 0, -1):
+    for remaining in range(0, 0, -1):
         sys.stdout.write("\r")
         sys.stdout.write("{:2d} seconds remaining.".format(remaining))
         sys.stdout.flush()
@@ -82,8 +82,8 @@ sleep_after_reset(5)
 # global variables for demo recording
 actions = []
 observation = []
-datagen = Logger(env, log_file='training_data_temp.log')
-rawlog = Logger(env, log_file='raw_log_temp.log')
+datagen = Logger(env, log_file='training_data.log')
+rawlog = Logger(env, log_file='raw_log.log')
 
 
 def playback():
@@ -95,21 +95,30 @@ def playback():
         z = -action[1]
         canvas = step[0]
 
-        cv2.rectangle(canvas, (20, 240), (40, int(240+220*x)), (76, 84,255), cv2.FILLED) 
-        cv2.rectangle(canvas, (320, 440), (int(320+300*z),460), (76, 84,255), cv2.FILLED) 
-
+        #! Speed bar indicator
+        cv2.rectangle(canvas, (20, 240), (50, int(240+220*x)),
+                      (76, 84, 255), cv2.FILLED)
+        cv2.rectangle(canvas, (320, 430), (int(320+300*z), 460),
+                      (76, 84, 255), cv2.FILLED)
 
         cv2.imshow('Playback', canvas)
-        cv2.waitKey(200)
+        cv2.waitKey(100)
+
     qa = input('1 to commit, 2 to abort:        ')
     #! User interaction for log selection
+    while not(qa == '1' or qa == '2'):
+        qa = input('1 to commit, 2 to abort:        ')
+
     if qa == '2':
         print('Reset log. Discard current...')
         rawlog.recording.clear()
         datagen.recording.clear()
+        print('Size of rawlog: ',len(rawlog.recording))
+
     else:
         datagen.on_episode_done()
         rawlog.on_episode_done()
+        print('Size of rawlog: ',len(rawlog.recording))
     #! Done
     cv2.destroyAllWindows()
     return qa

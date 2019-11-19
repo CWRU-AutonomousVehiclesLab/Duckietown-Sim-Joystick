@@ -35,9 +35,9 @@ class Logger:
 
     def _commit(self):
         # we use pickle to store our data
-        pickle.dump(self._recording, self._log_file)
+        pickle.dump(self.recording, self._log_file)
         self._log_file.flush()
-        del self._recording[:]
+        del self.recording[:]
 
     def close(self):
         self._multithreaded_recording.shutdown()
