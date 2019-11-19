@@ -23,9 +23,13 @@ from pyglet.window import key
 from gym_duckietown.envs import DuckietownEnv
 
 from distortion import Distortion
+from pwmcalculator import SteeringToWheelVelWrapper
 
 #! Camera Distorters
 distorter = Distortion()
+
+#! PWM Calculator
+pwm_converter = SteeringToWheelVelWrapper()
 
 #! Logger setup:
 logging.basicConfig()
@@ -90,14 +94,15 @@ def playback():
     for entry in rawlog.recording:
         step = entry['step']
         action = step[1]
-        x = -action[0]
-        z = -action[1]
+        x = action[0]
+        z = action[1]
         canvas = step[0]
-
+        pwm_left,pwm_right=pwm_converter.convert(x,z)
+        print('Linear: ',x,' Angular: ',z,'Left PWM: ',round(pwm_left,3),' Right PWM: ',round(pwm_right,3))
         #! Speed bar indicator
         cv2.rectangle(canvas, (20, 240), (50, int(240+220*x)),
                       (76, 84, 255), cv2.FILLED)
-        cv2.rectangle(canvas, (320, 430), (int(320+300*z), 460),
+        cv2.rectangle(canvas, (320, 430), (int(320+150*z), 460),
                       (76, 84, 255), cv2.FILLED)
 
         cv2.imshow('Playback', canvas)
@@ -206,22 +211,23 @@ def update(dt):
         return
 
     #! Nominal Joystick Interpretation
-    x = round(joystick.y, 2)*0.4  # To ensure maximum trun/velocity ratio
-    z = round(joystick.rx, 2)
+    x = round(joystick.y, 2)  # To ensure maximum trun/velocity ratio
+    z = round(joystick.rx, 2)*2.0
 
     #! Joystick deadband
     if (abs(round(joystick.rx, 2)) < 0.1):
-        z = 0
+        z = 0.0
 
     if (abs(round(joystick.y, 2)) < 0.1):
-        x = 0
+        x = 0.0
 
     #! DRS enable for straight line
     if joystick.buttons[5]:
-        x = -1
+        x = -2.0
 
     action = np.array([-x, -z])
-
+    pwm_left,pwm_right=pwm_converter.convert(-x,-z)
+    
     #! GO! and get next
     # * Observation is 640x480 pixels
     obs, reward, done, info = env.step(action)
