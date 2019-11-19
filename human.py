@@ -212,7 +212,7 @@ def update(dt):
 
     #! Nominal Joystick Interpretation
     x = round(joystick.y, 2)  # To ensure maximum trun/velocity ratio
-    z = round(joystick.rx, 2)*2.0
+    z = round(joystick.rx, 2)*2.2
 
     #! Joystick deadband
     if (abs(round(joystick.rx, 2)) < 0.1):
@@ -223,11 +223,11 @@ def update(dt):
 
     #! DRS enable for straight line
     if joystick.buttons[5]:
-        x = -2.0
+        x = -2
 
     action = np.array([-x, -z])
     pwm_left,pwm_right=pwm_converter.convert(-x,-z)
-    
+
     #! GO! and get next
     # * Observation is 640x480 pixels
     obs, reward, done, info = env.step(action)
