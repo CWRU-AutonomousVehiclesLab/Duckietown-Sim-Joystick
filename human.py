@@ -97,8 +97,9 @@ def playback():
         x = action[0]
         z = action[1]
         canvas = step[0]
-        pwm_left,pwm_right=pwm_converter.convert(x,z)
-        print('Linear: ',x,' Angular: ',z,'Left PWM: ',round(pwm_left,3),' Right PWM: ',round(pwm_right,3))
+        pwm_left, pwm_right = pwm_converter.convert(x, z)
+        print('Linear: ', x, ' Angular: ', z, 'Left PWM: ', round(
+            pwm_left, 3), ' Right PWM: ', round(pwm_right, 3))
         #! Speed bar indicator
         cv2.rectangle(canvas, (20, 240), (50, int(240-220*x)),
                       (76, 84, 255), cv2.FILLED)
@@ -117,12 +118,12 @@ def playback():
         print('Reset log. Discard current...')
         rawlog.recording.clear()
         datagen.recording.clear()
-        print('Size of rawlog: ',len(rawlog.recording))
+        print('Size of rawlog: ', len(rawlog.recording))
 
     else:
         datagen.on_episode_done()
         rawlog.on_episode_done()
-        print('Size of rawlog: ',len(rawlog.recording))
+        print('Size of rawlog: ', len(rawlog.recording))
     #! Done
     cv2.destroyAllWindows()
     return
@@ -225,10 +226,9 @@ def update(dt):
     if joystick.buttons[5]:
         x = -1.0
         z = 0.0
-        
 
     action = np.array([-x, -z])
-    pwm_left,pwm_right=pwm_converter.convert(-x,-z)
+    pwm_left, pwm_right = pwm_converter.convert(-x, -z)
 
     #! GO! and get next
     # * Observation is 640x480 pixels
@@ -237,29 +237,30 @@ def update(dt):
     if reward != -1000:
         print('Current Command: ', action,
               ' speed. Score: ', reward)
+        if reward >0.9:
+            #! Distort image for storage
+            obs_distorted = distorter.distort(obs)
+
+            #! resize to Nvidia standard:
+            obs_distorted_DS = image_resize(obs_distorted, width=200)
+
+            #! ADD IMAGE-PREPROCESSING HERE!!!!!
+            # height, width = obs_distorted_DS.shape[:2]
+            # print('Distorted return image Height: ', height,' Width: ',width)
+            cropped = obs_distorted_DS[50:150, 0:200]
+
+            # NOTICE: OpenCV changes the order of the channels !!!
+            cropped_final = cv2.cvtColor(cropped, cv2.COLOR_BGR2YUV)
+
+            # cv2.imshow('Whats logged', cropped_final)
+            # cv2.waitKey(1)
+
+            datagen.log(cropped_final, action, reward, done, info)
+            rawlog.log(obs, action, reward, done, info)
+        else:
+            print('Bad Training Data! Discarding...')
     else:
         print('!!!OUT OF BOUND!!!')
-        return  # DO not log out of bound ones
-
-    #! Distort image for storage
-    obs_distorted = distorter.distort(obs)
-
-    #! resize to Nvidia standard:
-    obs_distorted_DS = image_resize(obs_distorted, width=200)
-
-    #! ADD IMAGE-PREPROCESSING HERE!!!!!
-    # height, width = obs_distorted_DS.shape[:2]
-    # print('Distorted return image Height: ', height,' Width: ',width)
-    cropped = obs_distorted_DS[50:150, 0:200]
-
-    # NOTICE: OpenCV changes the order of the channels !!!
-    cropped_final = cv2.cvtColor(cropped, cv2.COLOR_BGR2YUV)
-
-    # cv2.imshow('Whats logged', cropped_final)
-    # cv2.waitKey(1)
-
-    datagen.log(cropped_final, action, reward, done, info)
-    rawlog.log(obs, action, reward, done, info)
 
     if done:
         playback()

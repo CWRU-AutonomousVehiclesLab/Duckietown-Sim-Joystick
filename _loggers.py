@@ -44,29 +44,3 @@ class Logger:
         self._multithreaded_recording.shutdown()
         self._log_file.close()
         os.chmod(self._log_file.name, 0o444)  # make file read-only after finishing
-
-
-class Reader:
-
-    def __init__(self, log_file):
-        self._log_file = open(log_file, 'rb')
-
-    def read(self):
-        end = False
-        observations = []
-        actions = []
-
-        while not end:
-            try:
-                log = pickle.load(self._log_file)
-                for entry in log:
-                    step = entry['step']
-                    observations.append(step[0])
-                    actions.append(step[1])
-            except EOFError:
-                end = True
-
-        return observations, actions
-
-    def close(self):
-        self._log_file.close()
