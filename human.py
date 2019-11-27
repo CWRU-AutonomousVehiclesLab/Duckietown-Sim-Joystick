@@ -39,8 +39,8 @@ logger.setLevel(logging.WARNING)
 #! Parser sector:
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-name', default=None)
-parser.add_argument('--map-name', default='zigzag_dists')
-parser.add_argument('--draw-curve', default=False, action='store_true',
+parser.add_argument('--map-name', default='regress_4way_adam')
+parser.add_argument('--draw-curve', default=True, action='store_true',
                     help='draw the lane following curve')
 parser.add_argument('--draw-bbox', default=False, action='store_true',
                     help='draw collision detection bounding boxes')
@@ -70,7 +70,7 @@ if args.env_name is None:
         draw_bbox=args.draw_bbox,
         domain_rand=False,
         distortion=0,
-        accept_start_angle_deg=4,  # start close to straight
+        accept_start_angle_deg=0.1,  # start close to straight
         full_transparency=True,
 
     )
@@ -93,13 +93,15 @@ def playback():
     #! Render Image
     for entry in rawlog.recording:
         step = entry['step']
+        meta = entry['metadata']
         action = step[1]
         x = action[0]
         z = action[1]
         canvas = step[0]
+        reward = meta[1]
         pwm_left, pwm_right = pwm_converter.convert(x, z)
         print('Linear: ', x, ' Angular: ', z, 'Left PWM: ', round(
-            pwm_left, 3), ' Right PWM: ', round(pwm_right, 3))
+            pwm_left, 3), ' Right PWM: ', round(pwm_right, 3),' Reward: ',round(reward,2))
         #! Speed bar indicator
         cv2.rectangle(canvas, (20, 240), (50, int(240-220*x)),
                       (76, 84, 255), cv2.FILLED)
@@ -237,7 +239,7 @@ def update(dt):
     if reward != -1000:
         print('Current Command: ', action,
               ' speed. Score: ', reward)
-        if reward >0.9:
+        if reward > -1000.0:
             #! Distort image for storage
             obs_distorted = distorter.distort(obs)
 
