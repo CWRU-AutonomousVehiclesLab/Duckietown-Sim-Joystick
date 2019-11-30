@@ -39,7 +39,7 @@ logger.setLevel(logging.WARNING)
 #! Parser sector:
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-name', default=None)
-parser.add_argument('--map-name', default='regress_4way_adam')
+parser.add_argument('--map-name', default='zigzag_dists')
 parser.add_argument('--draw-curve', default=True, action='store_true',
                     help='draw the lane following curve')
 parser.add_argument('--draw-bbox', default=False, action='store_true',
@@ -216,15 +216,15 @@ def update(dt):
         return
 
     #! Nominal Joystick Interpretation
-    x = round(joystick.y, 2)  # To ensure maximum trun/velocity ratio
-    z = round(joystick.z, 2) * 2
+    x = round(joystick.y, 2) * 0.7 # To ensure maximum trun/velocity ratio
+    z = round(joystick.z, 2) * 3
 
-    #! Joystick deadband
-    if (abs(round(joystick.y, 2)) < 0.01):
-        z = 0.0
+    # #! Joystick deadband
+    # if (abs(round(joystick.y, 2)) < 0.01):
+    #     z = 0.0
 
-    if (abs(round(joystick.z, 2)) < 0.01):
-        x = 0.0
+    # if (abs(round(joystick.z, 2)) < 0.01):
+    #     x = 0.0
 
     #! DRS enable for straight line
     if joystick.buttons[7]:
