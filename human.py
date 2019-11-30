@@ -209,23 +209,25 @@ def update(dt):
     """
     global actions, observation
 
+    print('Debug z and y:',joystick.y,'|||',joystick.z)
+
     #! Joystick no action do not record
-    if round(joystick.x, 2) == 0.0 and round(joystick.y, 2) == 0.0:
+    if round(joystick.z, 2) == 0.0 and round(joystick.y, 2) == 0.0:
         return
 
     #! Nominal Joystick Interpretation
     x = round(joystick.y, 2)  # To ensure maximum trun/velocity ratio
-    z = round(joystick.rx, 2) * 2
+    z = round(joystick.z, 2) * 2
 
     #! Joystick deadband
-    if (abs(round(joystick.rx, 2)) < 0.05):
+    if (abs(round(joystick.y, 2)) < 0.01):
         z = 0.0
 
-    if (abs(round(joystick.y, 2)) < 0.05):
+    if (abs(round(joystick.z, 2)) < 0.01):
         x = 0.0
 
     #! DRS enable for straight line
-    if joystick.buttons[5]:
+    if joystick.buttons[7]:
         x = -1.0
         z = 0.0
 
