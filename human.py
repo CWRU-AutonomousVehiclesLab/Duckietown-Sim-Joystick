@@ -39,7 +39,7 @@ logger.setLevel(logging.WARNING)
 #! Parser sector:
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-name', default=None)
-parser.add_argument('--map-name', default='zigzag_dists')
+parser.add_argument('--map-name', default='small_loop_cw')
 parser.add_argument('--draw-curve', default=True, action='store_true',
                     help='draw the lane following curve')
 parser.add_argument('--draw-bbox', default=False, action='store_true',
@@ -64,13 +64,13 @@ def sleep_after_reset(seconds):
 if args.env_name is None:
     env = DuckietownEnv(
         map_name=args.map_name,
-        max_steps=1000,
+        max_steps=1500,
 
         draw_curve=args.draw_curve,
         draw_bbox=args.draw_bbox,
         domain_rand=False,
         distortion=0,
-        accept_start_angle_deg=0.1,  # start close to straight
+        accept_start_angle_deg=1,
         full_transparency=True,
 
     )
@@ -87,7 +87,7 @@ actions = []
 observation = []
 datagen = Logger(env, log_file='training_data.log')
 rawlog = Logger(env, log_file='raw_log.log')
-
+last_reward = 0
 
 def playback():
     #! Render Image
@@ -101,7 +101,7 @@ def playback():
         reward = meta[1]
         pwm_left, pwm_right = pwm_converter.convert(x, z)
         print('Linear: ', x, ' Angular: ', z, 'Left PWM: ', round(
-            pwm_left, 3), ' Right PWM: ', round(pwm_right, 3),' Reward: ',round(reward,2))
+             pwm_left, 3), ' Right PWM: ', round(pwm_right, 3),' Reward: ',round(reward,2))
         #! Speed bar indicator
         cv2.rectangle(canvas, (20, 240), (50, int(240-220*x)),
                       (76, 84, 255), cv2.FILLED)
@@ -109,7 +109,7 @@ def playback():
                       (76, 84, 255), cv2.FILLED)
 
         cv2.imshow('Playback', canvas)
-        cv2.waitKey(100)
+        cv2.waitKey(20)
 
     qa = input('1 to commit, 2 to abort:        ')
     #! User interaction for log selection
@@ -207,16 +207,16 @@ def update(dt):
     This function is called at every frame to handle
     movement/stepping and redrawing
     """
-    global actions, observation
+    global actions, observation,last_reward
 
-    print('Debug z and y:',joystick.y,'|||',joystick.z)
+    #print('Debug z and y:',joystick.y,'|||',joystick.z)
 
     #! Joystick no action do not record
     if round(joystick.z, 2) == 0.0 and round(joystick.y, 2) == 0.0:
         return
 
     #! Nominal Joystick Interpretation
-    x = round(joystick.y, 2) * 0.7 # To ensure maximum trun/velocity ratio
+    x = round(joystick.y, 2) * 0.5  # To ensure maximum trun/velocity ratio
     z = round(joystick.z, 2) * 3
 
     # #! Joystick deadband
@@ -227,7 +227,7 @@ def update(dt):
     #     x = 0.0
 
     #! DRS enable for straight line
-    if joystick.buttons[7]:
+    if joystick.buttons[6]:
         x = -1.0
         z = 0.0
 
@@ -239,9 +239,10 @@ def update(dt):
     obs, reward, done, info = env.step(action)
 
     if reward != -1000:
-        print('Current Command: ', action,
-              ' speed. Score: ', reward)
-        if reward > -1000.0:
+    #    print('Current Command: ', action,
+     #         ' speed. Score: ', reward)
+        if ((reward > last_reward-0.02)):
+            print('log')
             #! Distort image for storage
             obs_distorted = distorter.distort(obs)
 
@@ -261,8 +262,10 @@ def update(dt):
 
             datagen.log(cropped_final, action, reward, done, info)
             rawlog.log(obs, action, reward, done, info)
+            last_reward = reward
         else:
             print('Bad Training Data! Discarding...')
+            last_reward = reward
     else:
         print('!!!OUT OF BOUND!!!')
 
