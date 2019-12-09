@@ -215,7 +215,7 @@ def update(dt):
         return
 
     #! Nominal Joystick Interpretation
-    x = round(joystick.y, 2) * 0.5  # To ensure maximum trun/velocity ratio
+    x = round(joystick.y, 2) * 0.8  # To ensure maximum trun/velocity ratio
     z = round(joystick.z, 2) * 3
 
     # #! Joystick deadband
@@ -240,7 +240,7 @@ def update(dt):
     if reward != -1000:
         print('Current Command: ', action,
               ' speed. Score: ', reward)
-        if ((reward > last_reward-0.02)):
+        if ((reward > last_reward-0.02) or True):
             print('log')
             #! Distort image for storage
             obs_distorted = distorter.distort(obs)
