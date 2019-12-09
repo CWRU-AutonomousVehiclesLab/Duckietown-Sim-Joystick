@@ -40,7 +40,7 @@ logger.setLevel(logging.WARNING)
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-name', default=None)
 parser.add_argument('--map-name', default='small_loop_cw')
-parser.add_argument('--draw-curve', default=True, action='store_true',
+parser.add_argument('--draw-curve', default=False, action='store_true',
                     help='draw the lane following curve')
 parser.add_argument('--draw-bbox', default=False, action='store_true',
                     help='draw collision detection bounding boxes')
@@ -63,16 +63,14 @@ def sleep_after_reset(seconds):
 #! Start Env
 if args.env_name is None:
     env = DuckietownEnv(
-        map_name=args.map_name,
+        map_name="loop_empty",
         max_steps=1500,
-
         draw_curve=args.draw_curve,
         draw_bbox=args.draw_bbox,
         domain_rand=False,
         distortion=0,
-        accept_start_angle_deg=1,
+        accept_start_angle_deg=4,
         full_transparency=True,
-
     )
 else:
     env = gym.make(args.env_name)
@@ -89,6 +87,7 @@ datagen = Logger(env, log_file='training_data.log')
 rawlog = Logger(env, log_file='raw_log.log')
 last_reward = 0
 
+
 def playback():
     #! Render Image
     for entry in rawlog.recording:
@@ -101,7 +100,7 @@ def playback():
         reward = meta[1]
         pwm_left, pwm_right = pwm_converter.convert(x, z)
         print('Linear: ', x, ' Angular: ', z, 'Left PWM: ', round(
-             pwm_left, 3), ' Right PWM: ', round(pwm_right, 3),' Reward: ',round(reward,2))
+            pwm_left, 3), ' Right PWM: ', round(pwm_right, 3), ' Reward: ', round(reward, 2))
         #! Speed bar indicator
         cv2.rectangle(canvas, (20, 240), (50, int(240-220*x)),
                       (76, 84, 255), cv2.FILLED)
@@ -207,7 +206,7 @@ def update(dt):
     This function is called at every frame to handle
     movement/stepping and redrawing
     """
-    global actions, observation,last_reward
+    global actions, observation, last_reward
 
     #print('Debug z and y:',joystick.y,'|||',joystick.z)
 
@@ -239,8 +238,8 @@ def update(dt):
     obs, reward, done, info = env.step(action)
 
     if reward != -1000:
-    #    print('Current Command: ', action,
-     #         ' speed. Score: ', reward)
+        print('Current Command: ', action,
+              ' speed. Score: ', reward)
         if ((reward > last_reward-0.02)):
             print('log')
             #! Distort image for storage
@@ -250,15 +249,15 @@ def update(dt):
             obs_distorted_DS = image_resize(obs_distorted, width=200)
 
             #! ADD IMAGE-PREPROCESSING HERE!!!!!
-            # height, width = obs_distorted_DS.shape[:2]
-            # print('Distorted return image Height: ', height,' Width: ',width)
-            cropped = obs_distorted_DS[50:150, 0:200]
+            height, width = obs_distorted_DS.shape[:2]
+            #print('Distorted return image Height: ', height,' Width: ',width)
+            cropped = obs_distorted_DS[0:150, 0:200]
 
             # NOTICE: OpenCV changes the order of the channels !!!
             cropped_final = cv2.cvtColor(cropped, cv2.COLOR_BGR2YUV)
 
-            # cv2.imshow('Whats logged', cropped_final)
-            # cv2.waitKey(1)
+            cv2.imshow('Whats logged', cropped_final)
+            cv2.waitKey(1)
 
             datagen.log(cropped_final, action, reward, done, info)
             rawlog.log(obs, action, reward, done, info)
