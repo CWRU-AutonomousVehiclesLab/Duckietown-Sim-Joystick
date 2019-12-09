@@ -63,7 +63,7 @@ def sleep_after_reset(seconds):
 #! Start Env
 if args.env_name is None:
     env = DuckietownEnv(
-        map_name="loop_empty",
+        map_name="zigzag_dists",
         max_steps=1500,
         draw_curve=args.draw_curve,
         draw_bbox=args.draw_bbox,
@@ -96,7 +96,7 @@ def playback():
         action = step[1]
         x = action[0]
         z = action[1]
-        canvas = step[0]
+        canvas = step[0].copy()
         reward = meta[1]
         pwm_left, pwm_right = pwm_converter.convert(x, z)
         print('Linear: ', x, ' Angular: ', z, 'Left PWM: ', round(
