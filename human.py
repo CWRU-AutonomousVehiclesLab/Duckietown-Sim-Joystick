@@ -126,7 +126,6 @@ def playback():
         rawlog.on_episode_done()
         print('Size of rawlog: ', len(rawlog.recording))
     #! Done
-    cv2.destroyAllWindows()
     return
 
 
@@ -251,7 +250,7 @@ def update(dt):
             #! ADD IMAGE-PREPROCESSING HERE!!!!!
             height, width = obs_distorted_DS.shape[:2]
             #print('Distorted return image Height: ', height,' Width: ',width)
-            cropped = obs_distorted_DS[50:150, 0:200]
+            cropped = obs_distorted_DS[0:150, 0:200]
 
             # NOTICE: OpenCV changes the order of the channels !!!
             cropped_final = cv2.cvtColor(cropped, cv2.COLOR_BGR2YUV)
